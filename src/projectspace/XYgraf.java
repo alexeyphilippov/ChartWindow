@@ -12,7 +12,7 @@ import javafx.scene.layout.StackPane;
 import java.io.File;
 import java.util.List;
 
-public class XYgraf extends StackPane{
+public class XYgraf {
 
     LineChart<Number, Number> numberLineChart;
     XYChart.Series series1;
@@ -38,11 +38,11 @@ public class XYgraf extends StackPane{
         }
         series1.setData(datas);
         numberLineChart.getData().add(series1);
-        numberLineChart.setLayoutY(30);
+        numberLineChart.setLayoutY(10);
     }
 
 public Pane getGrafPane(){
-    return new Pane(numberLineChart);//,getRdioButtons());
+    return new Pane(numberLineChart);
 
 }
 }

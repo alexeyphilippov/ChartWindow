@@ -1,37 +1,24 @@
 package projectspace;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
-
-import com.sun.org.apache.regexp.internal.RE;
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class MenuSample extends Application {
-
+    Parent currentGraf;
     File file;
+    boolean XYgrafOn = false;
+    boolean ScatterGrafOn = false;
 
+    final VBox vbox = new VBox();
     public static void main(String[] args) {
         launch(args);
     }
@@ -44,99 +31,76 @@ public class MenuSample extends Application {
         Scene scene = new Scene(new VBox(), 500, 500);
         scene.setFill(Color.OLDLACE);
 
-
-
         MenuBar menuBar = new MenuBar();
 
-        final VBox vbox = new VBox();
 
 
+        ToggleGroup group = new ToggleGroup();
         Menu menuFile = new Menu("File");
         MenuItem add = new MenuItem("Choose file");
+
+        Menu menuView  = new Menu("View");
+        RadioMenuItem chart1 = new RadioMenuItem("chart1");
+        RadioMenuItem chart2 = new RadioMenuItem("chart2");
+        chart1.setToggleGroup(group);
+        chart1.setSelected(true);
+        chart2.setToggleGroup(group);
+        group.selectedToggleProperty().addListener((ov, old_toggle, new_toggle) -> {
+            // Has selection.
+            if (group.getSelectedToggle() != null) {
+                RadioMenuItem button = (RadioMenuItem) group.getSelectedToggle();
+                checkState(button.getText());
+            }
+        });
+
         add.setOnAction(t -> {
             file = fileChooser.showOpenDialog(stage);
-            vbox.getChildren().addAll(getGraf(file));
+            currentGraf = getXYGraf(file);
+            vbox.getChildren().addAll(currentGraf);
         });
 
 
-        menuFile.getItems().addAll(add);
 
-        menuBar.getMenus().addAll(menuFile);
+        menuFile.getItems().addAll(add);
+        menuView.getItems().addAll(chart1,chart2);
+        menuBar.getMenus().addAll(menuFile,menuView);
 
         ((VBox) scene.getRoot()).getChildren().addAll(menuBar,vbox);
         stage.setScene(scene);
         stage.show();
     }
+    void checkState (String string){
+        if (XYgrafOn && string.equals("chart1")){
+            return;
+        } else if(!XYgrafOn && ScatterGrafOn && string.equals("chart1")){
+            vbox.getChildren().removeAll(currentGraf);
+           currentGraf = getScatterGraf(file);
+            vbox.getChildren().addAll(currentGraf);
+            currentGraf = getXYGraf(file);
+            XYgrafOn = true;
+            ScatterGrafOn = false;
+        } else if (XYgrafOn && !ScatterGrafOn && string.equals("chart2")) {
+            vbox.getChildren().removeAll(currentGraf);
+            currentGraf = getScatterGraf(file);
+            vbox.getChildren().addAll(currentGraf);
+            XYgrafOn = false;
+            ScatterGrafOn = true;
 
-//    public Pane getGrafPane(File file) {
-//        List<String> strings = FileUtils.readAll(file.getAbsolutePath());
-//        NumberAxis x = new NumberAxis();
-//        NumberAxis y = new NumberAxis(27, 29, 0.1);
-//
-//        LineChart<Number, Number> numberLineChart = new LineChart<Number, Number>(x, y);
-//        numberLineChart.setTitle("Series");
-//        XYChart.Series series1 = new XYChart.Series();
-//        ObservableList<XYChart.Data> datas = FXCollections.observableArrayList();
-//
-//        double[] arr = new double[20];
-//        for (int i = 0; i < 20; i++) {
-//            arr[i] = Double.parseDouble(strings.get(i).substring(14, 21));
-//        }
-//        for (int i = 0; i < 20; i++) {
-//            datas.add(new XYChart.Data(i, arr[i]));
-//        }
-//
-//        series1.setData(datas);
-//
-//        numberLineChart.getData().add(series1);
-//        numberLineChart.setLayoutY(30);
-//
-//        return new Pane(numberLineChart,getRdioButtons());
-//    }
+        }}
 
-    public Parent getGraf (File file){
+
+    public Parent getXYGraf (File file){
         List<String> strings = FileUtils.readAll(file.getAbsolutePath());
         XYgraf xYgraf = new XYgraf(strings);
+        XYgrafOn = true;
         return new Pane(xYgraf.getGrafPane());
     }
 
-    public Pane getRdioButtons() {
-        Label label = new Label("Your Gender: ");
-        Label labelInfo = new Label();
-        labelInfo.setTextFill(Color.BLUE);
-
-        // Group
-        ToggleGroup group = new ToggleGroup();
-
-        group.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
-            @Override
-            public void changed(ObservableValue<? extends Toggle> ov, Toggle old_toggle, Toggle new_toggle) {
-                // Has selection.
-                if (group.getSelectedToggle() != null) {
-                    RadioButton button = (RadioButton) group.getSelectedToggle();
-                    System.out.println("Button: " + button.getText());
-                    labelInfo.setText("You are " + button.getText());
-                }
-            }
-        });
-
-        // Radio 1: Male
-        RadioButton button1 = new RadioButton("Male");
-        button1.setToggleGroup(group);
-
-
-        // Radio 2: Female.
-        RadioButton button2 = new RadioButton("Female");
-        button2.setToggleGroup(group);
-
-        RadioButton button3 = new RadioButton("not stated");
-        button3.setSelected(true);
-        button3.setToggleGroup(group);
-
-        HBox root = new HBox();
-        root.setPadding(new Insets(50));
-        root.getChildren().addAll(label, button1, button2,button3, labelInfo);
-        root.setLayoutY(-40);
-        return root;
+    public Parent getScatterGraf (File file){
+        List<String> strings = FileUtils.readAll(file.getAbsolutePath());
+        ScatterGraf scatterGraf = new ScatterGraf(strings);
+        ScatterGrafOn = true;
+        return new Pane(scatterGraf.getScatterPane());
     }
+
 }
