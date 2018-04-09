@@ -1,4 +1,5 @@
 package projectspace;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,68 +25,72 @@ import javafx.stage.Stage;
 
 public class MenuSample extends Application {
     FileUtils fileUtils = new FileUtils();
-
+    Pane pane1;
+    File file;
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override
     public void start(Stage stage) {
+
         final FileChooser fileChooser = new FileChooser();
         stage.setTitle("Menu Sample");
-        Scene scene = new Scene(new VBox(), 400, 350);
+        Scene scene = new Scene(new VBox(), 600, 600);
         scene.setFill(Color.OLDLACE);
 
 
         MenuBar menuBar = new MenuBar();
 
         final VBox vbox = new VBox();
-        vbox.setAlignment(Pos.CENTER);
-        vbox.setSpacing(10);
-        vbox.setPadding(new Insets(0, 10, 0, 10));
+//        vbox.setAlignment(Pos.CENTER);
+//        vbox.setSpacing(10);
+//        vbox.setPadding(new Insets(0, 10, 0, 10));
 
         Menu menuFile = new Menu("File");
         MenuItem add = new MenuItem("Choose file");
         add.setOnAction(t -> {
-            File file = fileChooser.showOpenDialog(stage);
-            getGrafStage(new Stage(),file);
+            file = fileChooser.showOpenDialog(stage);
+            vbox.getChildren().addAll(getGrafPane(file));
         });
 
 
         menuFile.getItems().addAll(add);
 
-
         menuBar.getMenus().addAll(menuFile);
-        ((VBox) scene.getRoot()).getChildren().addAll(menuBar, vbox);
+        ((VBox) scene.getRoot()).getChildren().addAll(menuBar,vbox);
+//        pane.getChildren().addAll(menuBar);//,getGrafPane(file));
+//        stage.setScene(new Scene(pane,400,350));
         stage.setScene(scene);
         stage.show();
     }
 
-    public void getGrafStage(Stage stage, File file){
+    public Pane getGrafPane(File file) {
         List<String> strings = fileUtils.readAll(file.getAbsolutePath());
         NumberAxis x = new NumberAxis();
-        NumberAxis y = new NumberAxis(27, 29,0.1);
+        NumberAxis y = new NumberAxis(27, 29, 0.1);
 
-        LineChart<Number, Number> numberLineChart = new LineChart<Number, Number>(x,y);
+        LineChart<Number, Number> numberLineChart = new LineChart<Number, Number>(x, y);
         numberLineChart.setTitle("Series");
         XYChart.Series series1 = new XYChart.Series();
         ObservableList<XYChart.Data> datas = FXCollections.observableArrayList();
 
         double[] arr = new double[20];
-        for(int i=0; i<20; i++) {
-            arr[i] = Double.parseDouble(strings.get(i).substring(14,21));
+        for (int i = 0; i < 20; i++) {
+            arr[i] = Double.parseDouble(strings.get(i).substring(14, 21));
         }
-        for(int i=0; i<20; i++){
+        for (int i = 0; i < 20; i++) {
             datas.add(new XYChart.Data(i, arr[i]));
         }
 
         series1.setData(datas);
 
 
-        Scene scene = new Scene(numberLineChart, 600,600);
+//        Scene scene = new Scene(numberLineChart, 600,600);
         numberLineChart.getData().add(series1);
-        stage.setScene(scene);
-
-        stage.show();
+//        stage.setScene(scene);
+//
+//        stage.show();
+        return new Pane(numberLineChart);
     }
 }
