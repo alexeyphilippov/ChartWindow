@@ -38,6 +38,7 @@ public class MenuSample extends Application {
         ToggleGroup group = new ToggleGroup();
         Menu menuFile = new Menu("File");
         MenuItem add = new MenuItem("Choose file");
+        MenuItem clear = new Menu("Clear all");
 
         Menu menuView  = new Menu("View");
         RadioMenuItem chart1 = new RadioMenuItem("chart1");
@@ -50,6 +51,7 @@ public class MenuSample extends Application {
             if (group.getSelectedToggle() != null) {
                 RadioMenuItem button = (RadioMenuItem) group.getSelectedToggle();
                 checkState(button.getText());
+                System.out.println(XYgrafOn + " " + ScatterGrafOn);
             }
         });
 
@@ -59,9 +61,12 @@ public class MenuSample extends Application {
             vbox.getChildren().addAll(currentGraf);
         });
 
+        clear.setOnAction(e ->{
+            vbox.getChildren().removeAll(currentGraf);
+        });
 
 
-        menuFile.getItems().addAll(add);
+        menuFile.getItems().addAll(add,clear);
         menuView.getItems().addAll(chart1,chart2);
         menuBar.getMenus().addAll(menuFile,menuView);
 
@@ -74,9 +79,8 @@ public class MenuSample extends Application {
             return;
         } else if(!XYgrafOn && ScatterGrafOn && string.equals("chart1")){
             vbox.getChildren().removeAll(currentGraf);
-           currentGraf = getScatterGraf(file);
+           currentGraf = getXYGraf(file);
             vbox.getChildren().addAll(currentGraf);
-            currentGraf = getXYGraf(file);
             XYgrafOn = true;
             ScatterGrafOn = false;
         } else if (XYgrafOn && !ScatterGrafOn && string.equals("chart2")) {
