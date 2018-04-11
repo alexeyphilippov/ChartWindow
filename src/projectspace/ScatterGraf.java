@@ -19,7 +19,7 @@ public class ScatterGraf extends StackPane {
 
 
 
-        final NumberAxis xAxis = new NumberAxis(0, 10, 1);
+        final NumberAxis xAxis = new NumberAxis(0, 20, 1);
         final NumberAxis yAxis = new NumberAxis(27, 29, 0.1);
         final ScatterChart<Number,Number> sc = new
                 ScatterChart<Number,Number>(xAxis,yAxis);

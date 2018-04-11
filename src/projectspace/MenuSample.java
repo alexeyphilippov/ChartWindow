@@ -14,10 +14,10 @@ import javafx.stage.Stage;
 
 public class MenuSample extends Application {
     Parent currentGraf;
+    Stage notificationWindow = new Stage();
     File file;
     boolean XYgrafOn = false;
     boolean ScatterGrafOn = false;
-
     final VBox vbox = new VBox();
     public static void main(String[] args) {
         launch(args);
@@ -28,6 +28,10 @@ public class MenuSample extends Application {
 
         final FileChooser fileChooser = new FileChooser();
         stage.setTitle("Menu Sample");
+        stage.setOnCloseRequest(event -> {
+            stage.close();
+            notificationWindow.close();
+        });
         Scene scene = new Scene(new VBox(), 500, 500);
         scene.setFill(Color.OLDLACE);
 
@@ -41,16 +45,18 @@ public class MenuSample extends Application {
         MenuItem clear = new Menu("Clear all");
 
         Menu menuView  = new Menu("View");
-        RadioMenuItem chart1 = new RadioMenuItem("chart1");
-        RadioMenuItem chart2 = new RadioMenuItem("chart2");
-        chart1.setToggleGroup(group);
-        chart1.setSelected(true);
-        chart2.setToggleGroup(group);
+        RadioMenuItem linerChart = new RadioMenuItem("liner");
+        RadioMenuItem scatterChart = new RadioMenuItem("scatter");
+        linerChart.setToggleGroup(group);
+        scatterChart.setToggleGroup(group);
         group.selectedToggleProperty().addListener((ov, old_toggle, new_toggle) -> {
-            // Has selection.
             if (group.getSelectedToggle() != null) {
                 RadioMenuItem button = (RadioMenuItem) group.getSelectedToggle();
                 checkState(button.getText());
+                if(currentGraf == null && !XYgrafOn && !ScatterGrafOn ){
+                    scatterChart.setSelected(false);
+                    linerChart.setSelected(false);
+                }
                 System.out.println(XYgrafOn + " " + ScatterGrafOn);
             }
         });
@@ -59,15 +65,21 @@ public class MenuSample extends Application {
             file = fileChooser.showOpenDialog(stage);
             currentGraf = getXYGraf(file);
             vbox.getChildren().addAll(currentGraf);
+            linerChart.setSelected(true);
         });
 
         clear.setOnAction(e ->{
             vbox.getChildren().removeAll(currentGraf);
+            XYgrafOn = false;
+            ScatterGrafOn = false;
+            currentGraf = null;
+            scatterChart.setSelected(false);
+            linerChart.setSelected(false);
         });
 
 
         menuFile.getItems().addAll(add,clear);
-        menuView.getItems().addAll(chart1,chart2);
+        menuView.getItems().addAll(linerChart,scatterChart);
         menuBar.getMenus().addAll(menuFile,menuView);
 
         ((VBox) scene.getRoot()).getChildren().addAll(menuBar,vbox);
@@ -75,28 +87,49 @@ public class MenuSample extends Application {
         stage.show();
     }
     void checkState (String string){
-        if (XYgrafOn && string.equals("chart1")){
+        if (XYgrafOn && string.equals("liner")){
             return;
-        } else if(!XYgrafOn && ScatterGrafOn && string.equals("chart1")){
+        }else if(ScatterGrafOn && string.equals("scatter")){
+            return;
+        }
+        else if(!XYgrafOn && ScatterGrafOn && string.equals("liner")){
             vbox.getChildren().removeAll(currentGraf);
            currentGraf = getXYGraf(file);
             vbox.getChildren().addAll(currentGraf);
+
             XYgrafOn = true;
             ScatterGrafOn = false;
-        } else if (XYgrafOn && !ScatterGrafOn && string.equals("chart2")) {
+        } else if (XYgrafOn && !ScatterGrafOn && string.equals("scatter")) {
             vbox.getChildren().removeAll(currentGraf);
             currentGraf = getScatterGraf(file);
             vbox.getChildren().addAll(currentGraf);
             XYgrafOn = false;
             ScatterGrafOn = true;
 
-        }}
+        }else if(currentGraf == null && !XYgrafOn && !ScatterGrafOn ){
+            getNotifWindow();
+        }
+    }
+
+        public void getNotifWindow (){
+            Label label = new Label("Choose file first");
+            Button okButton  = new Button("Ok");
+            okButton.setOnMouseClicked(e->{
+                notificationWindow.hide();
+            });
+            okButton.setLayoutY(30);
+            okButton.setLayoutX(30);
+            Pane pane = new Pane(label,okButton);
+            notificationWindow.setScene(new Scene(pane,100, 70));
+            notificationWindow.show();
+        }
 
 
     public Parent getXYGraf (File file){
         List<String> strings = FileUtils.readAll(file.getAbsolutePath());
         XYgraf xYgraf = new XYgraf(strings);
         XYgrafOn = true;
+
         return new Pane(xYgraf.getGrafPane());
     }
 
