@@ -31,7 +31,6 @@ public class ScatterGraf extends StackPane {
 
             XYChart.Series series1 = new XYChart.Series();
             series1.setName("Equities");
-            series1.getData().add(new XYChart.Data(4.2, 193.2));
             datas = FXCollections.observableArrayList();
             double[] arr = new double[20];
             for (int i = 0; i < 20; i++) {

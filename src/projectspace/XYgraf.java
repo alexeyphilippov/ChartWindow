@@ -21,13 +21,14 @@ public class XYgraf {
     ObservableList<XYChart.Data> datas;
 
     public XYgraf(List<String> strings){
-        x = new NumberAxis();
+        x = new NumberAxis(0,20,1);
         y = new NumberAxis(27, 29, 0.1);
         numberLineChart = new LineChart<Number, Number>(x, y);
-        numberLineChart.setTitle("Series");
-
+        x.setLabel("Age (years)");
+        y.setLabel("Returns to date");
+        numberLineChart.setTitle("Investment Overview");
         series1 = new XYChart.Series();
-
+        series1.setName("Equities");
         datas = FXCollections.observableArrayList();
         double[] arr = new double[20];
         for (int i = 0; i < 20; i++) {
@@ -38,7 +39,7 @@ public class XYgraf {
         }
         series1.setData(datas);
         numberLineChart.getData().add(series1);
-        numberLineChart.setLayoutY(10);
+//        numberLineChart.setLayoutY(10);
     }
 
 public Pane getGrafPane(){

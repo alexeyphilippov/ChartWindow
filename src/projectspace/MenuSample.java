@@ -2,6 +2,7 @@ package projectspace;
 
 import java.io.File;
 import java.util.List;
+
 import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -15,36 +16,39 @@ import javafx.stage.Stage;
 public class MenuSample extends Application {
     Parent currentGraf;
     Stage notificationWindow = new Stage();
+    Stage stage;
     File file;
     boolean XYgrafOn = false;
     boolean ScatterGrafOn = false;
     final VBox vbox = new VBox();
+
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override
     public void start(Stage stage) {
-
-        final FileChooser fileChooser = new FileChooser();
+        this.stage = stage;
         stage.setTitle("Menu Sample");
         stage.setOnCloseRequest(event -> {
             stage.close();
             notificationWindow.close();
         });
-        Scene scene = new Scene(new VBox(), 500, 500);
+        stage.setResizable(false);
+        Scene scene = new Scene(createContent(), 490, 450);
         scene.setFill(Color.OLDLACE);
-
+        stage.setScene(scene);
+        stage.show();
+    }
+    public Parent createContent(){
+        final FileChooser fileChooser = new FileChooser();
         MenuBar menuBar = new MenuBar();
-
-
-
         ToggleGroup group = new ToggleGroup();
         Menu menuFile = new Menu("File");
         MenuItem add = new MenuItem("Choose file");
         MenuItem clear = new Menu("Clear all");
 
-        Menu menuView  = new Menu("View");
+        Menu menuView = new Menu("View");
         RadioMenuItem linerChart = new RadioMenuItem("liner");
         RadioMenuItem scatterChart = new RadioMenuItem("scatter");
         linerChart.setToggleGroup(group);
@@ -53,7 +57,7 @@ public class MenuSample extends Application {
             if (group.getSelectedToggle() != null) {
                 RadioMenuItem button = (RadioMenuItem) group.getSelectedToggle();
                 checkState(button.getText());
-                if(currentGraf == null && !XYgrafOn && !ScatterGrafOn ){
+                if (currentGraf == null && !XYgrafOn && !ScatterGrafOn) {
                     scatterChart.setSelected(false);
                     linerChart.setSelected(false);
                 }
@@ -68,7 +72,7 @@ public class MenuSample extends Application {
             linerChart.setSelected(true);
         });
 
-        clear.setOnAction(e ->{
+        clear.setOnAction(e -> {
             vbox.getChildren().removeAll(currentGraf);
             XYgrafOn = false;
             ScatterGrafOn = false;
@@ -78,23 +82,22 @@ public class MenuSample extends Application {
         });
 
 
-        menuFile.getItems().addAll(add,clear);
-        menuView.getItems().addAll(linerChart,scatterChart);
-        menuBar.getMenus().addAll(menuFile,menuView);
-
-        ((VBox) scene.getRoot()).getChildren().addAll(menuBar,vbox);
-        stage.setScene(scene);
-        stage.show();
+        menuFile.getItems().addAll(add, clear);
+        menuView.getItems().addAll(linerChart, scatterChart);
+        menuBar.getMenus().addAll(menuFile, menuView);
+        VBox vvBox = new VBox();
+        vvBox.getChildren().addAll(menuBar,vbox);
+        return vvBox;
     }
-    void checkState (String string){
-        if (XYgrafOn && string.equals("liner")){
+
+    void checkState(String string) {
+        if (XYgrafOn && string.equals("liner")) {
             return;
-        }else if(ScatterGrafOn && string.equals("scatter")){
+        } else if (ScatterGrafOn && string.equals("scatter")) {
             return;
-        }
-        else if(!XYgrafOn && ScatterGrafOn && string.equals("liner")){
+        } else if (!XYgrafOn && ScatterGrafOn && string.equals("liner")) {
             vbox.getChildren().removeAll(currentGraf);
-           currentGraf = getXYGraf(file);
+            currentGraf = getXYGraf(file);
             vbox.getChildren().addAll(currentGraf);
 
             XYgrafOn = true;
@@ -106,26 +109,26 @@ public class MenuSample extends Application {
             XYgrafOn = false;
             ScatterGrafOn = true;
 
-        }else if(currentGraf == null && !XYgrafOn && !ScatterGrafOn ){
+        } else if (currentGraf == null && !XYgrafOn && !ScatterGrafOn) {
             getNotifWindow();
         }
     }
 
-        public void getNotifWindow (){
-            Label label = new Label("Choose file first");
-            Button okButton  = new Button("Ok");
-            okButton.setOnMouseClicked(e->{
-                notificationWindow.hide();
-            });
-            okButton.setLayoutY(30);
-            okButton.setLayoutX(30);
-            Pane pane = new Pane(label,okButton);
-            notificationWindow.setScene(new Scene(pane,100, 70));
-            notificationWindow.show();
-        }
+    public void getNotifWindow() {
+        Label label = new Label("Choose file first");
+        Button okButton = new Button("Ok");
+        okButton.setOnMouseClicked(e -> {
+            notificationWindow.hide();
+        });
+        okButton.setLayoutY(30);
+        okButton.setLayoutX(30);
+        Pane pane = new Pane(label, okButton);
+        notificationWindow.setScene(new Scene(pane, 100, 70));
+        notificationWindow.show();
+    }
 
 
-    public Parent getXYGraf (File file){
+    public Parent getXYGraf(File file) {
         List<String> strings = FileUtils.readAll(file.getAbsolutePath());
         XYgraf xYgraf = new XYgraf(strings);
         XYgrafOn = true;
@@ -133,7 +136,7 @@ public class MenuSample extends Application {
         return new Pane(xYgraf.getGrafPane());
     }
 
-    public Parent getScatterGraf (File file){
+    public Parent getScatterGraf(File file) {
         List<String> strings = FileUtils.readAll(file.getAbsolutePath());
         ScatterGraf scatterGraf = new ScatterGraf(strings);
         ScatterGrafOn = true;
