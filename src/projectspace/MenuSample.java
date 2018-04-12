@@ -4,8 +4,11 @@ import java.io.File;
 import java.util.List;
 
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -14,13 +17,15 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class MenuSample extends Application {
-    Parent currentGraf;
-    Stage notificationWindow = new Stage();
-    Stage stage;
-    File file;
-    boolean XYgrafOn = false;
-    boolean ScatterGrafOn = false;
-    final VBox vbox = new VBox();
+    private Parent currentGraf;
+    private static Stage notificationWindow = new Stage();
+    private static Stage stage;
+    private File file;
+    List<String> strings;
+    ChartStuffing chartStuffing;
+    private boolean XYgrafOn = false;
+    private boolean ScatterGrafOn = false;
+    private final VBox vbox = new VBox();
 
     public static void main(String[] args) {
         launch(args);
@@ -40,7 +45,7 @@ public class MenuSample extends Application {
         stage.setScene(scene);
         stage.show();
     }
-    public Parent createContent(){
+    private Parent createContent(){
         final FileChooser fileChooser = new FileChooser();
         MenuBar menuBar = new MenuBar();
         ToggleGroup group = new ToggleGroup();
@@ -67,7 +72,9 @@ public class MenuSample extends Application {
 
         add.setOnAction(t -> {
             file = fileChooser.showOpenDialog(stage);
-            currentGraf = getXYGraf(file);
+            chartStuffing = new ChartStuffing(FileUtils.readAll(file.getAbsolutePath()));
+//            strings = FileUtils.readAll(file.getAbsolutePath());
+            currentGraf = getXYGraf();
             vbox.getChildren().addAll(currentGraf);
             linerChart.setSelected(true);
         });
@@ -90,14 +97,14 @@ public class MenuSample extends Application {
         return vvBox;
     }
 
-    void checkState(String string) {
+    private void checkState(String string) {
         if (XYgrafOn && string.equals("liner")) {
             return;
         } else if (ScatterGrafOn && string.equals("scatter")) {
             return;
         } else if (!XYgrafOn && ScatterGrafOn && string.equals("liner")) {
             vbox.getChildren().removeAll(currentGraf);
-            currentGraf = getXYGraf(file);
+            currentGraf = getXYGraf();
             vbox.getChildren().addAll(currentGraf);
 
             XYgrafOn = true;
@@ -114,7 +121,7 @@ public class MenuSample extends Application {
         }
     }
 
-    public void getNotifWindow() {
+    private void getNotifWindow() {
         Label label = new Label("Choose file first");
         Button okButton = new Button("Ok");
         okButton.setOnMouseClicked(e -> {
@@ -128,17 +135,14 @@ public class MenuSample extends Application {
     }
 
 
-    public Parent getXYGraf(File file) {
-        List<String> strings = FileUtils.readAll(file.getAbsolutePath());
-        XYgraf xYgraf = new XYgraf(strings);
+    private Parent getXYGraf() {
+        XYgraf xYgraf = new XYgraf(chartStuffing);
         XYgrafOn = true;
-
         return new Pane(xYgraf.getGrafPane());
     }
 
-    public Parent getScatterGraf(File file) {
-        List<String> strings = FileUtils.readAll(file.getAbsolutePath());
-        ScatterGraf scatterGraf = new ScatterGraf(strings);
+    private Parent getScatterGraf(File file) {
+        ScatterGraf scatterGraf = new ScatterGraf(chartStuffing);
         ScatterGrafOn = true;
         return new Pane(scatterGraf.getScatterPane());
     }
