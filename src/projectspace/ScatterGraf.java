@@ -8,7 +8,7 @@ import javafx.scene.layout.StackPane;
 
 public class ScatterGraf extends StackPane {
 
-        final ScatterChart<Number,Number> scatterChart;
+        private final ScatterChart<Number,Number> scatterChart;
 
         public ScatterGraf(ChartStuffing chartStuffing){
             scatterChart = new ScatterChart<Number,Number>(chartStuffing.getX(),chartStuffing.getY());

@@ -5,7 +5,7 @@ import javafx.scene.layout.Pane;
 
 public class XYgraf {
 
-    LineChart<Number, Number> numberLineChart;
+    private final LineChart<Number, Number> numberLineChart;
 
     public XYgraf(ChartStuffing chartStuffing){
         numberLineChart = new LineChart<Number, Number>(chartStuffing.getX(), chartStuffing.getY());

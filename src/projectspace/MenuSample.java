@@ -21,8 +21,7 @@ public class MenuSample extends Application {
     private static Stage notificationWindow = new Stage();
     private static Stage stage;
     private File file;
-    List<String> strings;
-    ChartStuffing chartStuffing;
+    private ChartStuffing chartStuffing;
     private boolean XYgrafOn = false;
     private boolean ScatterGrafOn = false;
     private final VBox vbox = new VBox();
